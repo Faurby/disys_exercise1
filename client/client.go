@@ -33,8 +33,9 @@ func SendGetCourseRequest(c course.CourseServiceClient) {
 	// So im sending an empty GetCourseRequest struct (look in .proto for more info)
 	message := course.GetCourseRequest{}
 
-	//This is the responses from the GetCourse method in server.go.
-	// Here I sending my request, and getting response back. Error if something bad happens
+	// This is the responses from the GetCourse method in server.go.
+	// Here Im sending my request, and getting response back. Error if something bad happens
+	// Becuase c.GetCourse needs to recieve a context, we create an empty with context.Background()
 	response, err := c.GetCourse(context.Background(), &message)
 
 	if err != nil {

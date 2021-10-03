@@ -15,6 +15,9 @@ type Server struct {
 	course.UnimplementedCourseServiceServer
 }
 
+// Since we passed the Server struct along earlier, we can now call these methods from "within" it. As far as I understand, we "overwrite" /
+// build on the already established GetCourse function from grpc.pg.go (maybe... not sure)
+// Basically its very importan how this method signature is written and how the reutrn function is formatted.
 func (s *Server) GetCourse(ctx context.Context, in *course.GetCourseRequest) (*course.GetCourseReply, error) {
 	fmt.Println("Recieved GetCourse request")
 	return &course.GetCourseReply{Message: "*List of all courses*"}, nil
@@ -33,11 +36,14 @@ func main() {
 		log.Fatalf("Failed to listen on port 8008: %v", err)
 	}
 
-	// Create a new grpc server with the generated server from the proto
+	// Create a new grpc server.
+	// Register our CourseService on our grpcServer, and passing our Server{} struct with
+	// Needs the struct for implementing the standard functions on it(?)
 	grpcServer := grpc.NewServer()
 	course.RegisterCourseServiceServer(grpcServer, &Server{})
 
-	// Accept incoming connections on the listener
+	// Accept incoming connections on the listener.
+	//  RegisterCourseServiceServer MUST be called before Serve()
 	if err := grpcServer.Serve(list); err != nil {
 		log.Fatalf("failed to server %v", err)
 	}
