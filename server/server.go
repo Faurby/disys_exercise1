@@ -1,46 +1,29 @@
 package main
 
 import (
-	"net/http"
+	"context"
+	"log"
+	"net"
 
-	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 )
 
+type Server struct {
+}
+
+func (s *Server) GetCourse(ctx context.Context, in *GetCourseRequest) (*GetCourseReply, error) {
+	return &GetCourseReply{Message: "*List of all courses*"}, nil
+}
+
 func main() {
-	router := gin.Default()
-	router.GET("/courses", getCourses)
-	router.POST("/courses", postCourse)
-	router.GET("/courses/:id", getCourseID)
-	router.GET("/courses/:id/students", getStudentsFromCourse)
+	list, err := net.Listen("tcp", ":8008")
+	if err != nil {
+		log.Fatalf("Failed to listen on port 8008: %v", err)
+	}
 
-	router.Run("localhost:8080")
-}
+	grpcServer := grpc.NewServer()
 
-// getAlbums responds with the list of all albums as JSON.
-func getCourses(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"List": "List of all courses!",
-	})
-}
+	if err := grpcServer.Serve(list); err != nil {
 
-func getCourseID(c *gin.Context) {
-	id := c.Param("id")
-
-	c.JSON(http.StatusOK, gin.H{
-		"courseID": id,
-	})
-}
-
-func postCourse(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"Course": "POST Success",
-	})
-}
-
-func getStudentsFromCourse(c *gin.Context) {
-	courseName := c.Param("id")
-	c.JSON(http.StatusOK, gin.H{
-		"CourseName":     courseName,
-		"ListOfStudents": "list",
-	})
+	}
 }

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package course;
+option go_package = "github.com/Faurby/disys_exercise1;course";
+
+service CourseService {
+    rpc GetCourse (GetCourseRequest) returns (GetCourseReply) {}
+}
+
+message GetCourseRequest {}
+message GetCourseReply {
+    string message = 1;
+}
