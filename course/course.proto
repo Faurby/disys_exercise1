@@ -5,9 +5,28 @@ option go_package = "github.com/Faurby/disys_exercise1;course";
 
 service CourseService {
     rpc GetCourse (GetCourseRequest) returns (GetCourseReply) {}
+
+    rpc PostCourse (PostCourseRequest) returns (PostCourseReply) {}
 }
 
 message GetCourseRequest {}
 message GetCourseReply {
+    string message = 1;
+}
+
+message PostCourseRequest {
+    string name = 1;
+    float ects = 2;
+    repeated Teacher teachers = 3;
+    int32 rating = 4;
+}
+
+message Teacher {
+    int32 id = 1;
+    string name = 2;
+    float score = 3;
+}
+
+message PostCourseReply {
     string message = 1;
 }

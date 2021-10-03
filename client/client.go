@@ -1,58 +1,66 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
+	"disys_exercise1/course"
 	"fmt"
-	"io/ioutil"
-	"net/http"
+	"log"
+
+	"google.golang.org/grpc"
 )
 
-var base string = "http://localhost:8080/"
-
 func main() {
-	fmt.Println("Starting the application...")
+	// Creat a virtual RPC Client Connection on port  8008 WithInsecure (because  of http)
+	var conn *grpc.ClientConn
+	conn, err := grpc.Dial(":8008", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Could not connect: %s", err)
+	}
 
-	HttpGetCourse()
-	HttpPostJSON()
-	HttpGetCourseID("9810")
-	HttpGetStudentsFromCourse("Algorithms and Data Structures")
+	// Defer means: When this function returns, call this method (meaing, one main is done, close connection)
+	defer conn.Close()
+
+	//  Create new Client from generated gRPC code from proto
+	c := course.NewCourseServiceClient(conn)
+
+	SendGetCourseRequest(c)
+	SendPostCourseRequst(c)
+
 }
 
-func HttpGetCourse() {
-	// Get response from http method
-	response, _ := http.Get(base + "courses")
+func SendGetCourseRequest(c course.CourseServiceClient) {
+	// This is tricky. Since I only want to get all courses, I dont need to send any data.
+	// So im sending an empty GetCourseRequest struct (look in .proto for more info)
+	message := course.GetCourseRequest{}
 
-	// Read the data from  the response
-	data, _ := ioutil.ReadAll(response.Body)
-	fmt.Println(string(data))
+	//This is the responses from the GetCourse method in server.go.
+	// Here I sending my request, and getting response back. Error if something bad happens
+	response, err := c.GetCourse(context.Background(), &message)
+
+	if err != nil {
+		log.Fatalf("Error when calling GetCourse: %s", err)
+	}
+
+	// Prints the response
+	fmt.Printf("Response from the Server: %s \n", response.Message)
 }
 
-func HttpPostJSON() {
-	// Create jsonData
-	jsonData := map[string]string{"message": "test"}
+func SendPostCourseRequst(c course.CourseServiceClient) {
+	// Now I wanna post something to the server, so I cant send empty request.
+	message := course.PostCourseRequest{
+		Name: "Algorithms and Data Structures",
+		Ects: 7.5,
+		Teachers: []*course.Teacher{{Id: 99, Name: "Thore Husfeldt", Score: 100},
+			{Id: 5, Name: "Troels Bjerre Lund", Score: 55}},
+		Rating: 100,
+	}
 
-	// Marshal json
-	jsonValue, _ := json.Marshal(jsonData)
+	// Same as above
+	response, err := c.PostCourse(context.Background(), &message)
+	if err != nil {
+		log.Fatalf("Error when calling PostCourse: %s", err)
+	}
 
-	// Get response from http method
-	response, _ := http.Post(base+"courses", "application/json", bytes.NewBuffer(jsonValue))
-
-	// Read the data from  the response
-	data, _ := ioutil.ReadAll(response.Body)
-	fmt.Println(string(data))
-}
-
-func HttpGetCourseID(id string) {
-	response, _ := http.Get(base + "courses/" + id)
-
-	data, _ := ioutil.ReadAll(response.Body)
-	fmt.Println(string(data))
-}
-
-func HttpGetStudentsFromCourse(courseName string) {
-	response, _ := http.Get(base + "courses/" + courseName + "/students")
-
-	data, _ := ioutil.ReadAll(response.Body)
-	fmt.Println(string(data))
+	// Same as above
+	fmt.Printf("Response from  the Server: %s \n", response.Message)
 }

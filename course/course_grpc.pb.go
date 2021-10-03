@@ -19,6 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CourseServiceClient interface {
 	GetCourse(ctx context.Context, in *GetCourseRequest, opts ...grpc.CallOption) (*GetCourseReply, error)
+	PostCourse(ctx context.Context, in *PostCourseRequest, opts ...grpc.CallOption) (*PostCourseReply, error)
 }
 
 type courseServiceClient struct {
@@ -38,11 +39,21 @@ func (c *courseServiceClient) GetCourse(ctx context.Context, in *GetCourseReques
 	return out, nil
 }
 
+func (c *courseServiceClient) PostCourse(ctx context.Context, in *PostCourseRequest, opts ...grpc.CallOption) (*PostCourseReply, error) {
+	out := new(PostCourseReply)
+	err := c.cc.Invoke(ctx, "/course.CourseService/PostCourse", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CourseServiceServer is the server API for CourseService service.
 // All implementations must embed UnimplementedCourseServiceServer
 // for forward compatibility
 type CourseServiceServer interface {
 	GetCourse(context.Context, *GetCourseRequest) (*GetCourseReply, error)
+	PostCourse(context.Context, *PostCourseRequest) (*PostCourseReply, error)
 	mustEmbedUnimplementedCourseServiceServer()
 }
 
@@ -52,6 +63,9 @@ type UnimplementedCourseServiceServer struct {
 
 func (UnimplementedCourseServiceServer) GetCourse(context.Context, *GetCourseRequest) (*GetCourseReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCourse not implemented")
+}
+func (UnimplementedCourseServiceServer) PostCourse(context.Context, *PostCourseRequest) (*PostCourseReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostCourse not implemented")
 }
 func (UnimplementedCourseServiceServer) mustEmbedUnimplementedCourseServiceServer() {}
 
@@ -84,6 +98,24 @@ func _CourseService_GetCourse_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CourseService_PostCourse_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostCourseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CourseServiceServer).PostCourse(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/course.CourseService/PostCourse",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CourseServiceServer).PostCourse(ctx, req.(*PostCourseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CourseService_ServiceDesc is the grpc.ServiceDesc for CourseService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -94,6 +126,10 @@ var CourseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCourse",
 			Handler:    _CourseService_GetCourse_Handler,
+		},
+		{
+			MethodName: "PostCourse",
+			Handler:    _CourseService_PostCourse_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

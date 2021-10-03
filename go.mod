@@ -1,4 +1,4 @@
-module example/web-service-gin
+module disys_exercise1
 
 go 1.17
 
