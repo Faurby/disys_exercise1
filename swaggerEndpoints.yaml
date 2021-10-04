@@ -114,6 +114,35 @@
           responses:
             200:
               description: OK
+        put:
+          summary: Updates a Course with new information
+          consumes:
+            - application/json
+          produces:
+            - application/json
+          parameters:
+          - in: body
+            name: course
+            description: Course object that needs to be updated
+            required: true
+            schema:
+              $ref: '#/definitions/Course'
+          responses:
+            200:
+              description: OK
+      /courses/{courseName}:
+        delete:
+          summary: Deletes a course
+          produces:
+            - application/json
+          parameters:
+            - name: courseName
+              in: path
+              required: true
+              type: "string"
+          responses:
+            200:
+              description: OK
       /courses/{courseName}/students:
         get:
           summary: Returns a list of a given course's students.
