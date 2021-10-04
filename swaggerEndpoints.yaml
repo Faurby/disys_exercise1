@@ -1,0 +1,175 @@
+    swagger: "2.0"
+    info:
+      title: Sample API
+      description: API description in Markdown.
+      version: 1.0.0
+    host: api.example.com
+    basePath: /v1
+    schemes:
+      - https
+    paths:
+      /students:
+        get:
+          summary: Returns a list of students.
+          description: Optional extended description in Markdown.
+          produces:
+            - application/json
+          responses:
+            200:
+              description: OK
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/definitions/Student"
+        post:
+          summary: Creates a new student.
+          parameters:
+            - in: body
+              name: student
+              schema:
+                $ref: '#/definitions/Student'
+          responses:
+            200:
+              description: OK
+      /students/{studentID}:
+          get:
+            summary: Returns a student by ID.
+            parameters:
+              - in: path
+                name: studentID
+                required: true
+                type: integer
+            responses:
+              200:
+                description: OK
+                schema:
+                  $ref: '#/definitions/Student'
+      /students/{studentID}/courses:
+          get:
+            summary: Returns a list of a given student's courses.
+            parameters:
+              - in: path
+                name: studentID
+                required: true
+                type: integer
+            responses:
+              200:
+                description: OK
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Course'
+      /teachers:
+        get:
+          summary: Returns a list of teachers.
+          description: Optional extended description in Markdown.
+          produces:
+            - application/json
+          responses:
+            200:
+              description: OK
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/definitions/Teacher"
+        post:
+          summary: Creates a new teacher.
+          parameters:
+            - in: body
+              name: teacher
+              schema:
+                $ref: '#/definitions/Teacher'
+          responses:
+            200:
+              description: OK
+      /teachers/{teacherID}:
+            get:
+              summary: Returns a teacher by ID.
+              parameters:
+                - in: path
+                  name: teacherID
+                  required: true
+                  type: integer
+              responses:
+                200:
+                  description: OK
+                  schema:
+                    $ref: '#/definitions/Teacher'
+      /courses:
+        get:
+          summary: Returns a list of courses.
+          description: Optional extended description in Markdown.
+          produces:
+            - application/json
+          responses:
+            200:
+              description: OK
+        post:
+          summary: Creates a new course.
+          parameters:
+            - in: body
+              name: course
+              schema:
+                $ref: '#/definitions/Course'
+          responses:
+            200:
+              description: OK
+      /courses/{courseName}/students:
+        get:
+          summary: Returns a list of a given course's students.
+          parameters:
+            - in: path
+              name: courseName
+              required: true
+              type: string
+          responses:
+            200:
+              description: OK
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/Student'
+    definitions:
+      Student:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          courses:
+            type: array
+            items:
+              $ref: '#/definitions/Course'
+        required:  
+          - id
+          - name
+      Teacher:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+          score:
+            type: number
+        required:  
+          - id
+          - name
+      Course:
+        type: object
+        properties:
+          name:
+            type: string
+          ECTS:
+            type: number
+          teachers:
+            type: array
+            items:
+              $ref: '#/definitions/Teacher'
+          rating:
+            type: number
+        required:  
+          - name
+          - ECTS
+          - teachers
