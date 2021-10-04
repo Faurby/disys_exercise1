@@ -19,12 +19,12 @@ type Server struct {
 // build on the already established GetCourse function from grpc.pg.go (maybe... not sure)
 // Basically its very importan how this method signature is written and how the reutrn function is formatted.
 func (s *Server) GetCourse(ctx context.Context, in *course.GetCourseRequest) (*course.GetCourseReply, error) {
-	fmt.Println("Recieved GetCourse request")
+	fmt.Println("Received GetCourse request")
 	return &course.GetCourseReply{Message: "*List of all courses*"}, nil
 }
 
 func (s *Server) PostCourse(ctx context.Context, in *course.PostCourseRequest) (*course.PostCourseReply, error) {
-	fmt.Printf("Recieved PostCourses request with course name: %s", in.Name)
+	fmt.Printf("Received PostCourses request with course name: %s", in.Name)
 	// Add courses to list / database of courses
 	return &course.PostCourseReply{Message: "Successfully posted new course"}, nil
 }
